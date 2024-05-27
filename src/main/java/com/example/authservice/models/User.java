@@ -15,7 +15,6 @@ import java.util.Set;
 @Table(name="users")
 
 public class User extends BaseClass  {
-
     public String email;
     String password;
     @ManyToMany(fetch = FetchType.EAGER)
