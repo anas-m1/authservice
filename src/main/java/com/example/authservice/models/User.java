@@ -13,6 +13,7 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name="users")
+
 public class User extends BaseClass  {
     public String email;
     String password;
