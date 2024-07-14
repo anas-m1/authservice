@@ -1,0 +1,32 @@
+
+first done using springboot-starter-security library,
+
+SecuritySecurity.java is added in security package
+    BcryptPasswordEncoder is added
+        to store password in db, we cant store it directly. so, we take help of bcryptpasswordencode
+        it stores in the hash generated itself. 2 same strings do not make same hash.
+
+    SecurityFilterChain
+        springboot-starter-security by default blocks all the endpoints.
+        but signup and login need to be enabled. so for allowing those and csrf and cors, we need sfc.
+
+
+first done using springboot-starter-security library,
+
+    signup, login are done.
+    validate with random token (session based) ---> validateSessionToken
+    ideally, validate should be in resource server(product service)
+
+    now with jwt token
+        in SpringSecurity.java algorithm and key is generated and made a bean.
+        because auth wont work if we create new secret everytime.
+
+
+
+
+alternative method for auth:
+
+all the functionality is alredy built-in in spring-boot-starter-oauth2-authorization-server
+    so that can be used out-of-the-box with some changes.
+    so that is present in security package
+

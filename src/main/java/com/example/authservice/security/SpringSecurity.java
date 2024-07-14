@@ -19,7 +19,9 @@ public class SpringSecurity {
         httpSecurity.cors().disable();
         httpSecurity.csrf().disable();
         httpSecurity.authorizeHttpRequests
-                (authorize->authorize.anyRequest().permitAll());
+                (authorize->authorize
+
+                        .anyRequest().permitAll());
         return httpSecurity.build();
     }
 

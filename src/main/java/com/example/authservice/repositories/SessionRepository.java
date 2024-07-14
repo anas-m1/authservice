@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface SessionRepository extends JpaRepository<Session,Long> {
     public Session save(Session session);
 
-    Session findByUser_IdAndToken(Long userId,String token);
+    Session findByUserIdAndToken(Long userId,String token);
 
     @Query(value="DELETE FROM users WHERE id = ?1",nativeQuery = true)
     void close(Long sessionId);

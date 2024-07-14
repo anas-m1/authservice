@@ -1,0 +1,55 @@
+oauth2
+
+login:
+    client clicks on login
+    redirected to google/fb or any other provider's login page
+    client enters details of google account login
+    google authenticates the user and asks permission from client to allow service to access details
+    client gives permission
+    google generates token,stores against applicatn name,userid in databse; and gives a token to client
+    token is stored in cookie/session storage/local storage in browser
+
+for subsequent requests:
+    whenever the user tries to access any endpoint, it sends the cookie in request header
+    the app service verifies the cookie is valid with the google server and the responds.
+
+since there are many db calls involved jwt is introduced.
+how this works?
+    alg.payload.signature
+    payload consists user info
+
+    when user signs up with auth server, a secret is generated which is stored in a central place(like kms or key vault)
+    the payload is signed with that secret using alg and signature is generated.
+    jwt token is created concatenating the 3 things and sent to client
+    jwt token is stored in cookie/session storage/local storage
+
+    in subsequent requests,
+        client passes token in request headers and
+        the resource server also has access to the secret generated from kms.
+        the resource server again creates the signature from payload using the secret, and verifies if it matches the one in token
+
+note: in some architectures, session data is also stored in db against the user id and token in order to limit the no. of concurrent logins.
+    in such cases, there will again be db calls. storing sessions data alongwith jwt defeats the purpose of using jwt altogether as again db calls will be introduced.
+
+
+CORS (Cross Origin Resource Sharing)
+    for eg: if i need a picture /video in my website, i just redirect/ ask client to get from a url (i.e. i only provide url)
+    the client has to go to other origin. this kind of activity is by default disabled by browsers and needs to be enabled explicitly.
+
+    in spring, we can do this in SecurityFilterChain.
+
+CSRF (Cross Site Request Forging)
+
+
+bcryptpasswordencoder
+    we dont just store the password as is in database
+    we encrypt it and store.
+
+    the way this works is:
+        bpe encrypts using some salt which is stored alongwith password.
+        so one plain password can match to 2^16 strings based on salt.
+        everytime we need to authenticate, it again encrypts and verifies if it matches with the stored encrypted password.
+
+
+
+

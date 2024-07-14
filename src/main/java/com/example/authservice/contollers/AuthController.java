@@ -69,10 +69,6 @@ public class AuthController {
         }
 
 
-
-//        String token=RandomStringUtils.randomAlphanumeric(30);
-
-//        String payload={'payload':'payload'};
         HashMap<String,String> payload=new HashMap<>();
         payload.put("payload","payload");
         byte[] content=payload.toString().getBytes(StandardCharsets.UTF_8);
@@ -89,10 +85,11 @@ public class AuthController {
 
         String token = Jwts.builder().content(content,"text/plain").signWith(skey,alg).compact();
 
-        Session s=new Session();
-        s.setUser(user);
-        s.setToken(token);
-        sessionRepository.save(s);
+//        save cookie in session
+//        Session s=new Session();
+//        s.setUser(user);
+//        s.setToken(token);
+//        sessionRepository.save(s);
 
         MultiValueMap<String,String> headers=new LinkedMultiValueMap<>();
         headers.add("AUTh-COOKIE",token);
@@ -105,14 +102,11 @@ public class AuthController {
         return new UserResponseDTO();
     }
 
+
+//    ideally validate should be in resource server
     @PostMapping("/validate")
     public ResponseEntity<Boolean> validate(@RequestBody ValidateTokenRequestDTO reqDTO){
         System.out.println("here::"+reqDTO.getUserId()+":"+reqDTO.getToken());
-        Session s= sessionRepository.findByUser_IdAndToken(reqDTO.getUserId(),reqDTO.getToken());
-
-        System.out.println(s+" : "+s.toString()+" : ");
-        if(Objects.isNull(s))
-            return new ResponseEntity<>(false,HttpStatus.OK);
 
 //        MacAlgorithm alg=null;
 //        SecretKey key=alg.key().build();
@@ -134,6 +128,19 @@ public class AuthController {
 //        }
 //
 ////        claims.get();
+
+        return new ResponseEntity<>(true,HttpStatus.OK);
+    }
+
+
+    @PostMapping("/validateSessionToken")
+    public ResponseEntity<Boolean> validateSessionToken(@RequestBody ValidateTokenRequestDTO reqDTO){
+        System.out.println("here::"+reqDTO.getUserId()+":"+reqDTO.getToken());
+        Session s= sessionRepository.findByUserIdAndToken(reqDTO.getUserId(),reqDTO.getToken());
+
+//        System.out.println(s+" : "+s.toString()+" : ");
+        if(Objects.isNull(s))
+            return new ResponseEntity<>(false,HttpStatus.OK);
 
         return new ResponseEntity<>(true,HttpStatus.OK);
     }
