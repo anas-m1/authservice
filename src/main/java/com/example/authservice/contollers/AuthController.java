@@ -6,10 +6,7 @@ import com.example.authservice.dtos.ValidateTokenRequestDTO;
 import com.example.authservice.models.Session;
 import com.example.authservice.models.User;
 import com.example.authservice.repositories.SessionRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.MacAlgorithm;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +20,7 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -69,8 +67,11 @@ public class AuthController {
         }
 
 
-        HashMap<String,String> payload=new HashMap<>();
-        payload.put("payload","payload");
+        HashMap<String,Object> payload=new HashMap<>();
+        payload.put("email",userDTO.getEmail());
+        long nowInMillis=System.currentTimeMillis();
+        payload.put("expiryTime",new Date(nowInMillis+10000));
+        payload.put("createdAt",new Date(nowInMillis));
         byte[] content=payload.toString().getBytes(StandardCharsets.UTF_8);
 
         MacAlgorithm alg=null;
@@ -83,7 +84,7 @@ public class AuthController {
         System.out.println("in login :: "+alg+" : "+ Base64.getEncoder().encodeToString(skey.getEncoded()));
 
 
-        String token = Jwts.builder().content(content,"text/plain").signWith(skey,alg).compact();
+        String token = Jwts.builder().claims(payload).signWith(skey,alg).compact();
 
 //        save cookie in session
 //        Session s=new Session();
@@ -118,10 +119,15 @@ public class AuthController {
 
 
 
-        Jwt jwt=
-                Jwts.parser().verifyWith(skey).build()
-                        .parse(reqDTO.getToken());
-        System.out.println(jwt+"hello claims");
+        JwtParser jwtParser=
+                Jwts.parser().verifyWith(skey).build();
+        Claims claims=jwtParser.parseSignedClaims(reqDTO.getToken()).getPayload();
+        System.out.println(claims+"hello claims");
+
+        if(Objects.isNull(claims)){
+            return new ResponseEntity<>(false,HttpStatus.OK);
+        }
+
 //        if(jws.isEmpty()){
 //            System.out.println("claims got empty");
 //            return null;

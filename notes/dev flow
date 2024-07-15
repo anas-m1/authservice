@@ -1,26 +1,37 @@
 
 first done using springboot-starter-security library,
 
-SecuritySecurity.java is added in security package
-    BcryptPasswordEncoder is added
-        to store password in db, we cant store it directly. so, we take help of bcryptpasswordencode
-        it stores in the hash generated itself. 2 same strings do not make same hash.
+    SecuritySecurity.java is added in security package
+        BcryptPasswordEncoder is added
+            to store password in db, we cant store it directly. so, we take help of bcryptpasswordencode
+            it stores in the hash generated itself. 2 same strings do not make same hash.
 
-    SecurityFilterChain
-        springboot-starter-security by default blocks all the endpoints.
-        but signup and login need to be enabled. so for allowing those and csrf and cors, we need sfc.
+        SecurityFilterChain
+            springboot-starter-security by default blocks all the endpoints.
+            but signup and login need to be enabled. so for allowing those and csrf and cors, we need sfc.
 
 
-first done using springboot-starter-security library,
+    first done using springboot-starter-security library,
 
-    signup, login are done.
-    validate with random token (session based) ---> validateSessionToken
-    ideally, validate should be in resource server(product service)
+        signup, login are done.
+        validate with random token (session based) ---> validateSessionToken
+        ideally, validate should be in resource server(product service)
 
-    now with jwt token
-        in SpringSecurity.java algorithm and key is generated and made a bean.
-        because auth wont work if we create new secret everytime.
+        now with jwt token
+            in SpringSecurity.java algorithm and key is generated and made a bean.
+            because auth wont work if we create new secret everytime.
 
+
+now with spring-boot-starter-oauth2-authorization-server
+     up until now, we did most of the things ourselves
+     the oauth2 lib comes with most things inbuilt.
+     add to pom.xml
+     add props in application.properties
+     copy functions in SecurityConfig.java file
+     UserDetailsService bean is present which has logic to authenticate the user.
+     but it stores the creds in-memory.
+     It is modified using CustomUserDetails which also stores in the db.
+     CustomGrantedAuthority also introduced to include roles in CustomUserDetails.
 
 
 
