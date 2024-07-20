@@ -1,11 +1,15 @@
 package com.example.authservice.contollers;
 
+import com.example.authservice.clients.KafkaProducerClient;
+import com.example.authservice.dtos.SendEmailMsgDTO;
 import com.example.authservice.dtos.UserDTO;
 import com.example.authservice.dtos.UserResponseDTO;
 import com.example.authservice.dtos.ValidateTokenRequestDTO;
 import com.example.authservice.models.Session;
 import com.example.authservice.models.User;
 import com.example.authservice.repositories.SessionRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.MacAlgorithm;
 import org.springframework.http.HttpStatus;
@@ -31,17 +35,22 @@ public class AuthController {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private SessionRepository sessionRepository;
     HashMap<MacAlgorithm,SecretKey> hm;
-
+    KafkaProducerClient kafkaProducerClient;
+    ObjectMapper objectMapper;
 
     public AuthController(UserController userController,
                           BCryptPasswordEncoder bcryptPasswordEncoder,
                           SessionRepository sessionRepository,
-                          HashMap<MacAlgorithm,SecretKey> hm){
+                          HashMap<MacAlgorithm,SecretKey> hm,
+                          KafkaProducerClient kafkaProducerClient,
+                          ObjectMapper objectMapper
+                          ){
         this.userController=userController;
         this.bCryptPasswordEncoder=bcryptPasswordEncoder;
         this.sessionRepository=sessionRepository;
         this.hm=hm;
-
+        this.kafkaProducerClient=kafkaProducerClient;
+        this.objectMapper=objectMapper;
     }
 
     @PostMapping("/signup")
@@ -50,6 +59,18 @@ public class AuthController {
         User user1=userController.createUser(userDTO);
 
         UserResponseDTO responseDTO=UserResponseDTO.from(user1);
+
+//      put msg in queue
+        try {
+            SendEmailMsgDTO sendEmailMsgDTO = new SendEmailMsgDTO();
+            sendEmailMsgDTO.setTo(responseDTO.getEmail());
+            sendEmailMsgDTO.setFrom("abc@gamil.com");
+            sendEmailMsgDTO.setBody("hello and welcome!");
+            sendEmailMsgDTO.setSubject("welcome");
+            kafkaProducerClient.sendMessage("sendEmail",objectMapper.writeValueAsString(sendEmailMsgDTO));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 

@@ -41,3 +41,9 @@ all the functionality is alredy built-in in spring-boot-starter-oauth2-authoriza
     so that can be used out-of-the-box with some changes.
     so that is present in security package
 
+
+to send email on signup
+    we need to use kafka
+    create KafkaProducerClient in clients package.
+    KafkaTemplate.send(topic,message)
+    use the above msg in userController
